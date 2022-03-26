@@ -27,12 +27,14 @@ namespace NekoChattingBot
             //We could .SafeFireAndForget() these two calls if we want to
             await twitchBot.JoinChannel("btmc");
             await twitchBot.JoinChannel("nekopavel");
+            await twitchBot.JoinChannel("thatoneguywhospamspogpega");
             await twitchBot.SendMessage("nekopavel", "/me Chatting Bot started");
 
             twitchBot.OnMessage += async (sender, twitchChatMessage) =>
             {
                 try
                 {
+                    if (twitchChatMessage.Sender.Equals("nekopavel")) lastSeen = DateTime.Now;
                     Console.WriteLine($"{twitchChatMessage.Sender} said '{twitchChatMessage.Message}'");
                     //Listen for !hey command
                     //if (twitchChatMessage.Message.StartsWith("!hey"))
@@ -41,12 +43,11 @@ namespace NekoChattingBot
                     //}
                     if (twitchChatMessage.Sender == "streamelements" && twitchChatMessage.Message.Contains("Use code \"BTMC\" for a 10% discount on your order at https://gfuel.ly/2ZplQ3B OkayChamp"))
                     {
-                        Console.WriteLine("Code message detected!");
-                        await twitchBot.SendMessage(twitchChatMessage.Channel, "/me PogO look at all these bots Stare");
+                        await twitchBot.SendMessage(twitchChatMessage.Channel, "/me gachiHYPER 👆 Use code \"Soque Macaque\" !!!");
                     }
-                    else if (twitchChatMessage.Message.StartsWith("!bored")) await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me HACKERMANS @{twitchChatMessage.Sender} create a chatbot.");
+                    else if (twitchChatMessage.Message.Contains("!bored")) await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me HACKERMANS @{twitchChatMessage.Sender} create a chatbot.");
                     #region disabled
-                    //else if (twitchChatMessage.Message.Contains("!test"))
+                    //else if (twitchChatMessage.Message.Contains("!red"))
                     //{
                     //    var httpWebRequest = (HttpWebRequest)WebRequest.Create("http://192.168.1.202:8123/api/webhook/twitch-bot");
                     //    httpWebRequest.Method = "POST";
@@ -132,7 +133,7 @@ namespace NekoChattingBot
                                         switch (state)
                                         {
                                             case "Running":
-                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Rice is being reheated, it has been kept warm for {minutes} minutes now.");
+                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Rice is being reheated, it has been kept warm for {minutes} minutes now. Current temperature is {temperature}°C");
                                                 break;
                                             default:
                                                 await twitchBot.SendMessage(twitchChatMessage.Channel, $"Unknown state: {state}");
@@ -150,7 +151,7 @@ namespace NekoChattingBot
                             {
                                 DateTime dateTime = DateTime.Now;
                                 string lastRice = riceCooker.last_updated;
-                                
+
 
                                 TimeSpan timeDiff = dateTime - DateTime.Parse(lastRice, CultureInfo.CreateSpecificCulture("se-SV"), DateTimeStyles.AllowInnerWhite);
 
@@ -159,7 +160,7 @@ namespace NekoChattingBot
                                     timeOutput = timeDiff.Days.ToString() + " days, " + timeDiff.Hours.ToString() + " hours and " + timeDiff.Minutes.ToString() + " minutes";
                                 else if (timeDiff.Hours > 0)
                                     timeOutput = timeDiff.Hours.ToString() + " hours and " + timeDiff.Minutes.ToString() + " minutes";
-                                else if(timeDiff.Minutes > 0)
+                                else if (timeDiff.Minutes > 0)
                                     timeOutput = timeDiff.Minutes.ToString() + " minutes";
 
                                 await twitchBot.SendMessage(twitchChatMessage.Channel, $"The rice cooker is off. It was last on {timeOutput} ago");
@@ -168,12 +169,18 @@ namespace NekoChattingBot
                     }
                     else if (twitchChatMessage.Message.Contains("@nekopavel", StringComparison.OrdinalIgnoreCase))
                     {
-
-                        if (lastSeen - DateTime.Now < TimeSpan.FromMinutes(5))
+                        TimeSpan lastSeenAgo = DateTime.Now - lastSeen;
+                        if (TimeSpan.FromMinutes(1.5) < lastSeenAgo && lastSeenAgo < TimeSpan.FromMinutes(5))
                         {
-                            await twitchBot.SendMessage(twitchChatMessage.Channel, "modCheck He seems to be in chat");
+                            string timeOutput = "";
+                            //$"modCheck He seems to be in chat. (Last chatted {lastSeenAgo.TotalMinutes} minutes ago)"
+                            if (lastSeenAgo.Minutes > 0)
+                                timeOutput = $"(Last chatted {lastSeenAgo.Minutes} minute(s) and {lastSeenAgo.Seconds} second(s) ago)";
+                            else if (lastSeenAgo.Seconds > 0)
+                                timeOutput = $"(Last chatted {lastSeenAgo.Seconds} second(s) ago)";
+                            await twitchBot.SendMessage(twitchChatMessage.Channel, "modCheck He seems to be in chat. " + timeOutput);
                         }
-                        else
+                        else if (lastSeenAgo > TimeSpan.FromMinutes(4))
                         {
                             string webAddr = "http://192.168.1.202:8123/api/services/notify/mobile_app_oneplus_7_pro";
 
@@ -193,7 +200,7 @@ namespace NekoChattingBot
                                 var result = client.UploadString(webAddr, "POST", json);
 
 
-                                await twitchBot.SendMessage(twitchChatMessage.Channel, "@NekoPavel has been pinged on his phone");
+                                await twitchBot.SendMessage(twitchChatMessage.Channel, "BOGGED He has been pinged on his phone now.");
                             }
                         }
 
@@ -202,11 +209,40 @@ namespace NekoChattingBot
                     {
                         await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me @{twitchChatMessage.Sender} Stare you didn't write \"Pogpega\" in your message, @mods ban him.");
                     }
-                    else if (twitchChatMessage.Sender.Equals("nekopavel"))  lastSeen = DateTime.Now; 
+                    else if (twitchChatMessage.Message.Contains("!math 9+10") || twitchChatMessage.Message.Contains("!math 10+9"))
+                        await twitchBot.SendMessage(twitchChatMessage.Channel, "/me Chatting 21");
+                    else if (twitchChatMessage.Message.Contains("!rea"))
+                        await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me @ {twitchChatMessage.Sender} https://imgur.com/a/3ygd3Vu ");
+                    else if (twitchChatMessage.Message.Contains("modCheck", StringComparison.OrdinalIgnoreCase) && twitchChatMessage.Message.Contains("nekopavel", StringComparison.OrdinalIgnoreCase))
+                    {
+                        using (var webClient = new System.Net.WebClient())
+                        {
+                            webClient.Headers.Add(HttpRequestHeader.Authorization, Environment.GetEnvironmentVariable("HA_KEY", EnvironmentVariableTarget.User));
+                            var json = webClient.DownloadString("http://192.168.1.202:8123/api/states/person.pavel");
+                            // Now parse with JSON.Net
+                            dynamic pavel = JObject.Parse(json);
+                            string location = pavel.state;
+                            switch (location)
+                            {
+                                case "home":
+                                    await twitchBot.SendMessage(twitchChatMessage.Channel, "/me HACKERMANS He seems to be at home.");
+                                    break;
+                                case "gym":
+                                    await twitchBot.SendMessage(twitchChatMessage.Channel, "/me GIGACHAD He's at the gym.");
+                                    break;
+                                case "work":
+                                    await twitchBot.SendMessage(twitchChatMessage.Channel, "/me Tasty hackingCD He's at the office.");
+                                    break;
+                                default:
+                                    await twitchBot.SendMessage(twitchChatMessage.Channel, "/me 4Shrug He's not in one of the known locations.");
+                                    break;
+                            }
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
-                    await twitchBot.SendMessage(twitchChatMessage.Channel, e.Message);
+                    await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me Chatting L + Ratio + Rip Bozo + {e.Message}");
                 }
             };
 
