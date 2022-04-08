@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.IO;
+using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
@@ -37,6 +39,22 @@ namespace NekoChattingBot
 
         public async Task SendMessage(string channel, string message)
         {
+            if (channel.Equals("btmc") && message!= "SEEYOUNEXTTIME")
+            {
+                //http://192.168.1.202:8123/api/states/sensor.btmc
+                using (var webClient = new System.Net.WebClient())
+                {
+                    webClient.Headers.Add(HttpRequestHeader.Authorization, Environment.GetEnvironmentVariable("HA_KEY", EnvironmentVariableTarget.User));
+                    var json = webClient.DownloadString("http://192.168.1.202:8123/api/states/sensor.btmc");
+                    // Now parse with JSON.Net
+                    dynamic btmcLive = JObject.Parse(json);
+                    string liveState = btmcLive.state;
+                    if (liveState.Equals("true", StringComparison.OrdinalIgnoreCase))
+                    {
+                        channel = "nekochattingbot";
+                    }
+                }
+            }
             await connected.Task;
             await streamWriter.WriteLineAsync($"PRIVMSG #{channel} :{message}");
         }
@@ -116,6 +134,10 @@ namespace NekoChattingBot
                         Sender = username,
                         Channel = channel
                     });
+                }
+                else
+                {
+                    Console.WriteLine(line);
                 }
             }
             
