@@ -15,6 +15,9 @@ namespace NekoChattingBot
 {
     internal class Program
     {
+
+        static readonly string[] Channels = new string[] { "btmc", "nekopavel", "nekochattingbot", "thatoneguywhospamspogpega" };
+
         static async Task Main(string[] args)
         {
             DateTime lastSeen = DateTime.MinValue;
@@ -25,11 +28,8 @@ namespace NekoChattingBot
             var twitchBot = new TwitchBot(botUsername, password);
             twitchBot.Start().SafeFireAndForget();
             //We could .SafeFireAndForget() these two calls if we want to
-            await twitchBot.JoinChannel("btmc");
-            await twitchBot.JoinChannel("nekopavel");
-            await twitchBot.JoinChannel("nekochattingbot");
-            //await twitchBot.JoinChannel("emanfman");
-            await twitchBot.JoinChannel("thatoneguywhospamspogpega");
+            for (int i = 0; i < Channels.Length; i++)
+                await twitchBot.JoinChannel(Channels[i]);
             await twitchBot.SendMessage("nekochattingbot", "/me Chatting Bot started");
 
             twitchBot.OnMessage += async (sender, twitchChatMessage) =>
