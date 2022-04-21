@@ -315,14 +315,48 @@ namespace NekoChattingBot
 
                         }
                     }
-                    else if (twitchChatMessage.Message.Contains("!nekorgb", StringComparison.OrdinalIgnoreCase))
+                    else if (twitchChatMessage.Message.StartsWith("!nekorgb", StringComparison.OrdinalIgnoreCase) || twitchChatMessage.Message.StartsWith("Pogpega !nekorgb", StringComparison.OrdinalIgnoreCase))
                     {
-                        throw new NotImplementedException("Chatting This is not done yet.");
-                        using (var webClient = new System.Net.WebClient())
+                        try
                         {
-
-                            string webAddr = "http://192.168.1.202:8123/api/services/notify/mobile_app_oneplus_7_pro";
-                            webClient.Headers.Add("Content-Type", "application/json");
+                            if (twitchChatMessage.Message.StartsWith("Pogpega"))
+                            {
+                                twitchChatMessage.Message = twitchChatMessage.Message.Substring(17);
+                            }
+                            else
+                            {
+                                twitchChatMessage.Message = twitchChatMessage.Message.Substring(9);
+                            }
+                            var splitMessage = twitchChatMessage.Message.Trim().Split(' ');
+                            //string command = twitchChatMessage.Message.Substring(0, twitchChatMessage.Message.IndexOf(' '));
+                            //string device = twitchChatMessage.Message.Substring(command.Length+1, twitchChatMessage.Message.IndexOf(' ',command.Length+1));
+                            string command = splitMessage[0];
+                            string device = splitMessage[1];
+                            if (splitMessage.Length == 3)
+                            {
+                                var colours = splitMessage[2].Split(',');
+                                int red = int.Parse(colours[0]);
+                                int green = int.Parse(colours[1]);
+                                int blue = int.Parse(colours[2]);
+                                throw new NotImplementedException($"Chatting This is not done yet. Got command: \"{command}\", device \"{device}\", r{red},g{green},b{blue}");
+                            }
+                            else if (splitMessage.Length > 3)
+                            {
+                                throw new IndexOutOfRangeException();
+                            }
+                            throw new NotImplementedException($"Chatting This is not done yet. Got command: \"{command}\", device \"{device}\"");
+                            using (var webClient = new System.Net.WebClient())
+                            {
+                                string webAddr = "http://192.168.1.202:8123/api/services/light/";
+                                webClient.Headers.Add("Content-Type", "application/json");
+                            }
+                        }
+                        catch (IndexOutOfRangeException)
+                        {
+                            await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me Chatting You used the command with the wrong syntax. Correct syntax: !nekorgb on/off/toggle <device> optional:<rgb colour like 250,59,177>");
+                        }
+                        catch {
+                            throw;
                         }
                     }
                     else if (twitchChatMessage.Message.Contains("!math 9+10") || twitchChatMessage.Message.Contains("!math 10+9"))
@@ -339,8 +373,14 @@ namespace NekoChattingBot
                             var json = webClient.DownloadString("http://192.168.1.202:8123/api/states/sensor.btmc");
                             // Now parse with JSON.Net
                             dynamic btmcLive = JObject.Parse(json);
-                            string liveState = btmcLive.state;
-                            await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me {liveState}");
+                            string livestateString = btmcLive.state;
+                            bool isLive = bool.Parse(livestateString);
+                            string live;
+                            if (isLive)
+                                live = "YEP";
+                            else
+                                live = "NOPERS";
+                            await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me @{twitchChatMessage.Sender} {live}");
                         }
                     }
                     else if (twitchChatMessage.Message.Contains("modCheck", StringComparison.OrdinalIgnoreCase) && (twitchChatMessage.Message.Contains("nekopavel", StringComparison.OrdinalIgnoreCase) || twitchChatMessage.Message.Contains("@nekopavel", StringComparison.OrdinalIgnoreCase)))
@@ -391,17 +431,10 @@ namespace NekoChattingBot
                 }
                 catch (Exception e)
                 {
-                    await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me Chatting L + Ratio + Rip Bozo + {e.Message}");
+                    await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me Chatting L + Ratio + Rip Bozo + {e} {e.Message}");
                 }
             };
-
-
-
-
-
             await Task.Delay(-1);
-
-
         }
     }
 }
