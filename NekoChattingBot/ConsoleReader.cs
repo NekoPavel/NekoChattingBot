@@ -8,16 +8,7 @@ namespace NekoChattingBot
 {
     internal class ConsoleReader
     {
-
-        public ConsoleReader()
-        {
-
-        }
-
-        private async Task<string> GetInputAsync()
-        {
-            return (Task.Run(() => Console.ReadLine())).Result;
-        }
+        private async Task<string> GetInputAsync() => (Task.Run(() => Console.ReadLine())).Result;
 
     }
 }
