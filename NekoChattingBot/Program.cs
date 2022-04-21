@@ -104,7 +104,7 @@ namespace NekoChattingBot
 
                             string state = riceCookerState.state;
 
-                            if (riceCooker.state == "on" || state == "AutoKeepWarm")
+                            if (riceCooker.state == "on" || state == "AutoKeepWarm" || state == "PreCook")
                             {
 
                                 json = webClient.DownloadString("http://192.168.1.202:8123/api/states/sensor.xiaomi_miio_cooker_menu");
@@ -116,6 +116,11 @@ namespace NekoChattingBot
                                 dynamic riceCookerRemaining = JObject.Parse(json);
 
                                 string minutes = riceCookerRemaining.state;
+
+                                json = webClient.DownloadString("http://192.168.1.202:8123/api/states/sensor.xiaomi_miio_cooker_duration");
+                                dynamic riceCookerDuration = JObject.Parse(json);
+
+                                string duration = riceCookerDuration.state;
 
                                 //sensor.xiaomi_miio_cooker_temperature
                                 json = webClient.DownloadString("http://192.168.1.202:8123/api/states/sensor.xiaomi_miio_cooker_temperature");
@@ -180,7 +185,45 @@ namespace NekoChattingBot
                                                 break;
                                         }
                                         break;
+                                    case 258:
+                                        switch (state)
+                                        {
+                                            case "Running":
+                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Rice is being reheated, it will be done in {minutes} minutes. Current temperature is {temperature}°C. Current stage is: {stage}, {stageDescription}.");
+                                                break;
+                                            default:
+                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Unknown state: {state}");
+                                                break;
+                                        }
+                                        break;
+                                    case 260:
+                                        switch (state)
+                                        {
+                                            case "Running":
+                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Making tasty rice, it will be done in {minutes} minutes. Current temperature is {temperature}°C. Current stage is: {stage}, {stageDescription}.");
+                                                break;
+                                            case "PreCook":
+                                                string timeOutput = "";
+                                                TimeSpan startIn = TimeSpan.FromMinutes(double.Parse(minutes));
+                                                //$"modCheck He seems to be in chat. (Last chatted {lastSeenAgo.TotalMinutes} minutes ago)"
+                                                if (startIn.Hours > 0)
+                                                    timeOutput = $"({startIn.Hours} hour(s), {startIn.Minutes} minute(s) and {startIn.Seconds} second(s))";
+                                                else if (startIn.Minutes > 0)
+                                                    timeOutput = $"({startIn.Minutes} minute(s) and {startIn.Seconds} second(s))";
+                                                else if (startIn.Seconds > 0)
+                                                    timeOutput = $"({startIn.Seconds} second(s))";
+                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Rice cooker is scheduled to start cooking tasty rice in {timeOutput}.");
+                                                break;
+                                            case "AutoKeepWarm":
+                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"The tasty rice is done, it has been kept warm for {minutes} minutes now.");
+                                                break;
+                                            default:
+                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Unknown state: {state}");
+                                                break;
+                                        }
+                                        break;
                                     default:
+                                        await twitchBot.SendMessage(twitchChatMessage.Channel, $"Chatting Unknown mode: {mode}");
                                         break;
                                 }
 
@@ -231,7 +274,8 @@ namespace NekoChattingBot
                                 var result = webClient.UploadString(webAddr, "POST", jsonRequest);
                                 await twitchBot.SendMessage(twitchChatMessage.Channel, "DinkDonk He has been pinged on his phone now and the room light is now on.");
                             }
-                            else*/ if (sleeping.Equals("on", StringComparison.OrdinalIgnoreCase))
+                            else*/
+                            if (sleeping.Equals("on", StringComparison.OrdinalIgnoreCase))
                             {/* If you actually want him to get a notification include this in your message \"HOLYSHITSTHISISIMPORTANTWAKEUP!\". (Note: this will flash his lights and most likely actually wake him up, please don't abuse.*/
                                 await twitchBot.SendMessage(twitchChatMessage.Channel, "Bedge He is asleep.");
                             }
@@ -269,6 +313,16 @@ namespace NekoChattingBot
 
                             }
 
+                        }
+                    }
+                    else if (twitchChatMessage.Message.Contains("!nekorgb", StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new NotImplementedException("Chatting This is not done yet.");
+                        using (var webClient = new System.Net.WebClient())
+                        {
+
+                            string webAddr = "http://192.168.1.202:8123/api/services/notify/mobile_app_oneplus_7_pro";
+                            webClient.Headers.Add("Content-Type", "application/json");
                         }
                     }
                     else if (twitchChatMessage.Message.Contains("!math 9+10") || twitchChatMessage.Message.Contains("!math 10+9"))
