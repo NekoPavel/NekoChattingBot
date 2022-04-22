@@ -1,12 +1,14 @@
-﻿namespace NekoChattingBot.Commands
+﻿using static NekoChattingBot.TwitchBot;
+
+namespace NekoChattingBot.Commands
 {
     public class Test : Command
     {
         public static string Name = "test";
 
-        public override async void Execute(TwitchBot botInstance, string rawArgs)
+        public override async void Execute(TwitchBot botInstance, TwitchChatMessage twitchChatMessage, string rawArgs)
         {
-            await botInstance.SendMessage("pancakes", "Test!");
+            await botInstance.SendMessage(twitchChatMessage.Channel, "Test!");
         }
     }
 }

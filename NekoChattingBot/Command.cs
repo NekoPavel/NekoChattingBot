@@ -1,4 +1,6 @@
-﻿namespace NekoChattingBot
+﻿using static NekoChattingBot.TwitchBot;
+
+namespace NekoChattingBot
 {
     /// <summary>
     /// Twitch bot command.
@@ -13,6 +15,6 @@
         /// Method that will be executed, once command is fired. Should be async if any interaction with <see cref="TwitchBot"/> is planned.
         /// </summary>
         /// <param name="rawArgs">Raw unsplit string of arguments provided after the command.</param>
-        public abstract void Execute(TwitchBot botInstance, string rawArgs);
+        public abstract void Execute(TwitchBot botInstance, TwitchChatMessage twitchChatMessage, string rawArgs);
     }
 }
