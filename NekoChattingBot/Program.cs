@@ -11,9 +11,6 @@ namespace NekoChattingBot
 {
     internal class Program
     {
-        /// <summary>
-        /// Channels that will be initially joined.
-        /// </summary>
         static CommandCache commandCache;
 
         static async Task Main(string[] args)
