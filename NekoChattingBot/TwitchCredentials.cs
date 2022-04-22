@@ -1,4 +1,6 @@
-﻿namespace NekoChattingBot
+﻿using System;
+
+namespace NekoChattingBot
 {
     public static class TwitchCredentials
     {
