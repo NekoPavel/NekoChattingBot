@@ -62,6 +62,7 @@ namespace NekoChattingBot
                     /*                the new command system :)              */
                     /*                                                       */
 
+                    #region NEEDS_MIGRATION
                     if (twitchChatMessage.Message.Contains("!bored")) await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me HACKERMANS @{twitchChatMessage.Sender} create a chatbot.");
                     #region disabled
                     //else if (twitchChatMessage.Message.Contains("!red"))
@@ -441,7 +442,7 @@ namespace NekoChattingBot
                     //{
                     //    await twitchBot.SendMessage(twitchChatMessage.Channel, $"@{twitchChatMessage.Sender} TAMPERMONKEY: https://www.tampermonkey.net/ + OVERLAY SCRIPT: https://bit.ly/3iWmdhc (this only overlays pixel art, it doesn't place anything) ");
                     //}
-
+                    #endregion
                 }
                 catch (Exception e)
                 {

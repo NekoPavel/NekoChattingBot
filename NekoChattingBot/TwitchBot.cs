@@ -50,9 +50,7 @@ namespace NekoChattingBot
                     dynamic btmcLive = JObject.Parse(json);
                     string liveState = btmcLive.state;
                     if (liveState.Equals("true", StringComparison.OrdinalIgnoreCase))
-                    {
                         channel = "nekochattingbot";
-                    }
                 }
             }
             await connected.Task;
@@ -71,10 +69,7 @@ namespace NekoChattingBot
             await streamWriter.WriteLineAsync($"PART #{channel}");
         }
 
-        private bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-        {
-            return sslPolicyErrors == SslPolicyErrors.None;
-        }
+        private bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => sslPolicyErrors == SslPolicyErrors.None;
 
         public async Task Start()
         {
@@ -136,9 +131,7 @@ namespace NekoChattingBot
                     });
                 }
                 else
-                {
                     Console.WriteLine(line);
-                }
             }
 
         }
