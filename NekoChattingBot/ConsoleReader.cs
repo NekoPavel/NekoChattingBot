@@ -8,6 +8,7 @@ namespace NekoChattingBot
 {
     internal class ConsoleReader
     {
+        // TO-DO(mishashto): ???
         private async Task<string> GetInputAsync() => (Task.Run(() => Console.ReadLine())).Result;
 
     }
