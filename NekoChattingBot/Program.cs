@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -10,22 +11,26 @@ namespace NekoChattingBot
 {
     internal class Program
     {
-
-        static readonly string[] Channels = new string[] { "btmc", "nekopavel", "nekochattingbot", "thatoneguywhospamspogpega" };
+        /// <summary>
+        /// Channels that will be initially joined.
+        /// </summary>
+        static CommandCache commandCache;
 
         static async Task Main(string[] args)
         {
-            DateTime lastSeen = DateTime.MinValue;
-            string mods = "ThatOneGuyWhoSpamsPogpega, aeonim, andros18, bennyoberwinch, bigtimemassivecash, binfy, bluecrystal004, boxbox, chase55t, chrchie, cloud9, deadrote, derpyfoxplayz, digitalhypno, dios_dong, doremy, elcheer, eleeement_, emanfman, enyoti, fossabot, happystick, honmi, intlcoco, itswinter, jamiethebull, joiechii, kaoran, kerneon, ksn24, l3lackshark, littleendu, luckfire, mikuia, mrchompysaur, mrdutchboi, mrnolife_, nightbot, olibomby, oralekin, piscator_, rainbowmeeps, ryotou, shigetora, shugi, slpchatbot, soarnathan, soran2202, streamelements, stunterletsplay, thepoon, theramu, therealzachtv, toekneered, toybickler, tru3o_o, tuonto, warpworldbot, wholewheatpete, yazzehh, ypaperr, zarrah, zonelouise, nekopavel";
-            string password = Environment.GetEnvironmentVariable("TWITCH_OAUTH", EnvironmentVariableTarget.User);
-            string botUsername = "NekoChattingBot";
+            commandCache = new CommandCache();
+            commandCache.CacheExisting();
 
-            var twitchBot = new TwitchBot(botUsername, password);
+            DateTime lastSeen = DateTime.MinValue;
+
+            var twitchBot = new TwitchBot(TwitchCredentials.botUsername, TwitchCredentials.password);
             twitchBot.Start().SafeFireAndForget();
             //We could .SafeFireAndForget() these two calls if we want to
-            for (int i = 0; i < Channels.Length; i++)
-                await twitchBot.JoinChannel(Channels[i]);
-            await twitchBot.SendMessage("nekochattingbot", "/me Chatting Bot started");
+            for (int i = 0; i < TwitchCredentials.Channels.Length; i++)
+                await twitchBot.JoinChannel(TwitchCredentials.Channels[i]);
+
+            if (TwitchCredentials.Channels.Any("nekochattingbot".Contains)) // send the message only if it's in the channel.
+                await twitchBot.SendMessage("nekochattingbot", "/me Chatting Bot started");
 
             twitchBot.OnMessage += async (sender, twitchChatMessage) =>
             {
@@ -33,15 +38,34 @@ namespace NekoChattingBot
                 {
                     if (twitchChatMessage.Sender.Equals("nekopavel")) lastSeen = DateTime.Now;
                     if (twitchChatMessage.Sender.Equals("thatoneguywhospamspogpega", StringComparison.OrdinalIgnoreCase) && !twitchChatMessage.Message.Contains("Pogpega", StringComparison.OrdinalIgnoreCase))
-                    {
                         await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me @{twitchChatMessage.Sender} Stare GunL you didn't write \"Pogpega\" in your message, @mods ban him.");
-                    }
                     Console.WriteLine($"{twitchChatMessage.Sender} said '{twitchChatMessage.Message}'");
                     if (twitchChatMessage.Sender == "streamelements" && twitchChatMessage.Message.Contains("Use code \"BTMC\" for a 30% discount on your order at https://gfuel.ly/2ZplQ3B OkayChamp"))
-                    {
                         await twitchBot.SendMessage(twitchChatMessage.Channel, "/me gachiHYPER 👆 Use code \"Soque Macaque\" !!!");
+
+                    string rawMessage = twitchChatMessage.Message;
+                    string[] msgArguments = rawMessage.Split(' ');
+                    if (msgArguments.Length < 1 || !msgArguments[0].StartsWith("!"))
+                        return;
+                    string command = msgArguments[0].Substring(1).ToLower();
+
+                    if (!commandCache.Exists(command))
+                    {
+                        Console.WriteLine($"Command doesn't exist in the cache: {command}.");
+                        return;
                     }
-                    else if (twitchChatMessage.Message.Contains("!bored")) await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me HACKERMANS @{twitchChatMessage.Sender} create a chatbot.");
+
+                    dynamic commandInstance = commandCache.GetCommandInstance(command);
+                    commandInstance.Execute(twitchBot, String.Join(" ", msgArguments.Skip(1).ToArray()));
+
+                    return;
+
+                    /*                                                       */
+                    /*   Anything below this isn't executed. Migrate it to   */
+                    /*                the new command system :)              */
+                    /*                                                       */
+
+                    if (twitchChatMessage.Message.Contains("!bored")) await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me HACKERMANS @{twitchChatMessage.Sender} create a chatbot.");
                     #region disabled
                     //else if (twitchChatMessage.Message.Contains("!red"))
                     //{
@@ -132,9 +156,6 @@ namespace NekoChattingBot
                                 dynamic riceCookerStageName = JObject.Parse(json);
 
                                 string stage = riceCookerStageName.state;
-
-
-
 
                                 switch (mode)
                                 {
@@ -370,12 +391,12 @@ namespace NekoChattingBot
                             }
                         }
                     }
-                    if (twitchChatMessage.Message.Contains("!kill") && mods.Contains(twitchChatMessage.Sender, StringComparison.OrdinalIgnoreCase))
+                    if (twitchChatMessage.Message.Contains("!kill") && TwitchCredentials.mods.Contains(twitchChatMessage.Sender, StringComparison.OrdinalIgnoreCase))
                     {
                         await twitchBot.SendMessage(twitchChatMessage.Channel, "SEEYOUNEXTTIME");
                         Environment.Exit(0);
                     }
-                    else if (twitchChatMessage.Message.Contains("!kill") && !mods.Contains(twitchChatMessage.Sender, StringComparison.OrdinalIgnoreCase))
+                    else if (twitchChatMessage.Message.Contains("!kill") && !TwitchCredentials.mods.Contains(twitchChatMessage.Sender, StringComparison.OrdinalIgnoreCase))
                     {
                         await twitchBot.SendMessage(twitchChatMessage.Channel, "OuttaPocket Tssk Only mods and nekopavel can use this command");
                     }
@@ -383,6 +404,7 @@ namespace NekoChattingBot
                     //{
                     //    await twitchBot.SendMessage(twitchChatMessage.Channel, $"@{twitchChatMessage.Sender} TAMPERMONKEY: https://www.tampermonkey.net/ + OVERLAY SCRIPT: https://bit.ly/3iWmdhc (this only overlays pixel art, it doesn't place anything) ");
                     //}
+
                 }
                 catch (Exception e)
                 {
