@@ -39,7 +39,7 @@ namespace NekoChattingBot
 
         public async Task SendMessage(string channel, string message)
         {
-            if (channel.Equals("btmc") && message!= "SEEYOUNEXTTIME")
+            if (channel.Equals("btmc") && message != "SEEYOUNEXTTIME")
             {
                 //http://192.168.1.202:8123/api/states/sensor.btmc
                 using (var webClient = new System.Net.WebClient())
@@ -64,7 +64,7 @@ namespace NekoChattingBot
             await connected.Task;
             await streamWriter.WriteLineAsync($"JOIN #{channel}");
         }
-        
+
         public async Task LeaveChannel(string channel)
         {
             await connected.Task;
@@ -140,12 +140,9 @@ namespace NekoChattingBot
                     Console.WriteLine(line);
                 }
             }
-            
-        }
-        public async Task Stop()
-        {
 
         }
+        public async Task Stop() { } // TO-DO(mishashto): ???
 
     }
 }
