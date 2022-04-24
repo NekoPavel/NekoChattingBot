@@ -39,6 +39,71 @@ namespace NekoChattingBot
                     Console.WriteLine($"{twitchChatMessage.Sender} said '{twitchChatMessage.Message}'");
                     if (twitchChatMessage.Sender == "streamelements" && twitchChatMessage.Message.Contains("Use code \"BTMC\" for a 30% discount on your order at https://gfuel.ly/2ZplQ3B OkayChamp"))
                         await twitchBot.SendMessage(twitchChatMessage.Channel, "/me gachiHYPER 👆 Use code \"Soque Macaque\" !!!");
+                    if (twitchChatMessage.Message.Contains("@nekopavel", StringComparison.OrdinalIgnoreCase))
+                    {
+                        using (var webClient = new System.Net.WebClient())
+                        {
+                            webClient.Headers.Add(HttpRequestHeader.Authorization, Environment.GetEnvironmentVariable("HA_KEY", EnvironmentVariableTarget.User));
+                            var json = webClient.DownloadString("http://192.168.1.202:8123/api/states/input_boolean.pavel_sleep_sleeping");
+                            // Now parse with JSON.Net
+                            dynamic sleep = JObject.Parse(json);
+                            string sleeping = sleep.state;
+                            /*if (sleeping.Equals("on", StringComparison.OrdinalIgnoreCase) && twitchChatMessage.Message.Contains("HOLYSHITSTHISISIMPORTANTWAKEUP!", StringComparison.OrdinalIgnoreCase))
+                            {
+                                string webAddr = "http://192.168.1.202:8123/api/services/notify/mobile_app_oneplus_7_pro";
+                                webClient.Headers.Add("Content-Type", "application/json");
+
+
+                                string jsonRequest = JsonSerializer.Serialize(new
+                                {
+                                    title = $"Important pinged by {twitchChatMessage.Sender} in {twitchChatMessage.Channel}",
+                                    message = twitchChatMessage.Message
+                                });
+
+                                var result = webClient.UploadString(webAddr, "POST", jsonRequest);
+                                await twitchBot.SendMessage(twitchChatMessage.Channel, "DinkDonk He has been pinged on his phone now and the room light is now on.");
+                            }
+                            else*/
+                            if (sleeping.Equals("on", StringComparison.OrdinalIgnoreCase))
+                            {/* If you actually want him to get a notification include this in your message \"HOLYSHITSTHISISIMPORTANTWAKEUP!\". (Note: this will flash his lights and most likely actually wake him up, please don't abuse.*/
+                                await twitchBot.SendMessage(twitchChatMessage.Channel, "Bedge He is asleep.");
+                            }
+                            else
+                            {
+                                TimeSpan lastSeenAgo = DateTime.Now - lastSeen;
+                                if (TimeSpan.FromMinutes(1.5) < lastSeenAgo && lastSeenAgo < TimeSpan.FromMinutes(5))
+                                {
+                                    string timeOutput = "";
+                                    //$"modCheck He seems to be in chat. (Last chatted {lastSeenAgo.TotalMinutes} minutes ago)"
+                                    if (lastSeenAgo.Minutes > 0)
+                                        timeOutput = $"(Last chatted {lastSeenAgo.Minutes} minute(s) and {lastSeenAgo.Seconds} second(s) ago)";
+                                    else if (lastSeenAgo.Seconds > 0)
+                                        timeOutput = $"(Last chatted {lastSeenAgo.Seconds} second(s) ago)";
+                                    await twitchBot.SendMessage(twitchChatMessage.Channel, "modCheck He seems to be in chat. " + timeOutput);
+                                }
+                                else if (lastSeenAgo > TimeSpan.FromMinutes(4))
+                                {
+                                    string webAddr = "http://192.168.1.202:8123/api/services/notify/mobile_app_oneplus_7_pro";
+                                    webClient.Headers.Add("Content-Type", "application/json");
+
+
+                                    string jsonRequest = JsonSerializer.Serialize(new
+                                    {
+                                        title = $"Pinged by {twitchChatMessage.Sender} in {twitchChatMessage.Channel}",
+                                        message = twitchChatMessage.Message
+                                    });
+
+                                    var result = webClient.UploadString(webAddr, "POST", jsonRequest);
+
+
+                                    await twitchBot.SendMessage(twitchChatMessage.Channel, "BOGGED He has been pinged on his phone now.");
+
+                                }
+
+                            }
+
+                        }
+                    }
 
                     string rawMessage = twitchChatMessage.Message;
                     string[] msgArguments = rawMessage.Split(' ');
@@ -63,49 +128,10 @@ namespace NekoChattingBot
                     /*                                                       */
 
                     #region NEEDS_MIGRATION
+
                     if (twitchChatMessage.Message.Contains("!bored")) await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me HACKERMANS @{twitchChatMessage.Sender} create a chatbot.");
-                    #region disabled
-                    //else if (twitchChatMessage.Message.Contains("!red"))
-                    //{
-                    //    var httpWebRequest = (HttpWebRequest)WebRequest.Create("http://192.168.1.202:8123/api/webhook/twitch-bot");
-                    //    httpWebRequest.Method = "POST";
-                    //    using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
-                    //    {
-                    //        streamWriter.Write("");
-                    //    }
 
-                    //    var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                    //    using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
-                    //    {
-                    //        var result = streamReader.ReadToEnd();
-                    //    }
-                    //}
-                    #endregion
-                    else if (twitchChatMessage.Message.Contains("!nekonp"))
-                    {
-                        using (var webClient = new System.Net.WebClient())
-                        {
-                            webClient.Headers.Add(HttpRequestHeader.Authorization, Environment.GetEnvironmentVariable("HA_KEY", EnvironmentVariableTarget.User));
-                            var json = webClient.DownloadString("http://192.168.1.202:8123/api/states/media_player.spotify_pavel_kuzminov");
-                            // Now parse with JSON.Net
-                            dynamic spotify = JObject.Parse(json);
-                            string isPlaying = spotify.state;
 
-                            if (isPlaying == "playing")
-                            {
-                                string songName = spotify.attributes.media_title;
-                                string songArtist = spotify.attributes.media_artist;
-                                string songAlbum = spotify.attributes.media_album_name;
-                                string songId = spotify.attributes.media_content_id;
-                                string songLink = "https://open.spotify.com/track/" + songId.Substring(14); //spotify:track:1Bv2pFGVUQmGQZcpLgvn7K
-                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Currently listening to: {songName} by {songArtist} from the album {songAlbum}. Song link: {songLink}");
-                            }
-                            else
-                            {
-                                await twitchBot.SendMessage(twitchChatMessage.Channel, "No music is playing right now");
-                            }
-                        }
-                    }
                     else if (twitchChatMessage.Message.Contains("!rice"))
                     {
                         using (var webClient = new System.Net.WebClient())
@@ -264,71 +290,7 @@ namespace NekoChattingBot
                             }
                         }
                     }
-                    else if (twitchChatMessage.Message.Contains("@nekopavel", StringComparison.OrdinalIgnoreCase))
-                    {
-                        using (var webClient = new System.Net.WebClient())
-                        {
-                            webClient.Headers.Add(HttpRequestHeader.Authorization, Environment.GetEnvironmentVariable("HA_KEY", EnvironmentVariableTarget.User));
-                            var json = webClient.DownloadString("http://192.168.1.202:8123/api/states/input_boolean.pavel_sleep_sleeping");
-                            // Now parse with JSON.Net
-                            dynamic sleep = JObject.Parse(json);
-                            string sleeping = sleep.state;
-                            /*if (sleeping.Equals("on", StringComparison.OrdinalIgnoreCase) && twitchChatMessage.Message.Contains("HOLYSHITSTHISISIMPORTANTWAKEUP!", StringComparison.OrdinalIgnoreCase))
-                            {
-                                string webAddr = "http://192.168.1.202:8123/api/services/notify/mobile_app_oneplus_7_pro";
-                                webClient.Headers.Add("Content-Type", "application/json");
 
-
-                                string jsonRequest = JsonSerializer.Serialize(new
-                                {
-                                    title = $"Important pinged by {twitchChatMessage.Sender} in {twitchChatMessage.Channel}",
-                                    message = twitchChatMessage.Message
-                                });
-
-                                var result = webClient.UploadString(webAddr, "POST", jsonRequest);
-                                await twitchBot.SendMessage(twitchChatMessage.Channel, "DinkDonk He has been pinged on his phone now and the room light is now on.");
-                            }
-                            else*/
-                            if (sleeping.Equals("on", StringComparison.OrdinalIgnoreCase))
-                            {/* If you actually want him to get a notification include this in your message \"HOLYSHITSTHISISIMPORTANTWAKEUP!\". (Note: this will flash his lights and most likely actually wake him up, please don't abuse.*/
-                                await twitchBot.SendMessage(twitchChatMessage.Channel, "Bedge He is asleep.");
-                            }
-                            else
-                            {
-                                TimeSpan lastSeenAgo = DateTime.Now - lastSeen;
-                                if (TimeSpan.FromMinutes(1.5) < lastSeenAgo && lastSeenAgo < TimeSpan.FromMinutes(5))
-                                {
-                                    string timeOutput = "";
-                                    //$"modCheck He seems to be in chat. (Last chatted {lastSeenAgo.TotalMinutes} minutes ago)"
-                                    if (lastSeenAgo.Minutes > 0)
-                                        timeOutput = $"(Last chatted {lastSeenAgo.Minutes} minute(s) and {lastSeenAgo.Seconds} second(s) ago)";
-                                    else if (lastSeenAgo.Seconds > 0)
-                                        timeOutput = $"(Last chatted {lastSeenAgo.Seconds} second(s) ago)";
-                                    await twitchBot.SendMessage(twitchChatMessage.Channel, "modCheck He seems to be in chat. " + timeOutput);
-                                }
-                                else if (lastSeenAgo > TimeSpan.FromMinutes(4))
-                                {
-                                    string webAddr = "http://192.168.1.202:8123/api/services/notify/mobile_app_oneplus_7_pro";
-                                    webClient.Headers.Add("Content-Type", "application/json");
-
-
-                                    string jsonRequest = JsonSerializer.Serialize(new
-                                    {
-                                        title = $"Pinged by {twitchChatMessage.Sender} in {twitchChatMessage.Channel}",
-                                        message = twitchChatMessage.Message
-                                    });
-
-                                    var result = webClient.UploadString(webAddr, "POST", jsonRequest);
-
-
-                                    await twitchBot.SendMessage(twitchChatMessage.Channel, "BOGGED He has been pinged on his phone now.");
-
-                                }
-
-                            }
-
-                        }
-                    }
                     else if (twitchChatMessage.Message.StartsWith("!nekorgb", StringComparison.OrdinalIgnoreCase) || twitchChatMessage.Message.StartsWith("Pogpega !nekorgb", StringComparison.OrdinalIgnoreCase))
                     {
                         try
@@ -344,7 +306,7 @@ namespace NekoChattingBot
                             var splitMessage = twitchChatMessage.Message.Trim().Split(' ');
                             //string command = twitchChatMessage.Message.Substring(0, twitchChatMessage.Message.IndexOf(' '));
                             //string device = twitchChatMessage.Message.Substring(command.Length+1, twitchChatMessage.Message.IndexOf(' ',command.Length+1));
-                            string command = splitMessage[0];
+                            string command2 = splitMessage[0];
                             string device = splitMessage[1];
                             if (splitMessage.Length == 3)
                             {
@@ -352,13 +314,13 @@ namespace NekoChattingBot
                                 int red = int.Parse(colours[0]);
                                 int green = int.Parse(colours[1]);
                                 int blue = int.Parse(colours[2]);
-                                throw new NotImplementedException($"Chatting This is not done yet. Got command: \"{command}\", device \"{device}\", r{red},g{green},b{blue}");
+                                throw new NotImplementedException($"Chatting This is not done yet. Got command: \"{command2}\", device \"{device}\", r{red},g{green},b{blue}");
                             }
                             else if (splitMessage.Length > 3)
                             {
                                 throw new IndexOutOfRangeException();
                             }
-                            throw new NotImplementedException($"Chatting This is not done yet. Got command: \"{command}\", device \"{device}\"");
+                            throw new NotImplementedException($"Chatting This is not done yet. Got command: \"{command2}\", device \"{device}\"");
                             using (var webClient = new System.Net.WebClient())
                             {
                                 string webAddr = "http://192.168.1.202:8123/api/services/light/";
@@ -369,7 +331,8 @@ namespace NekoChattingBot
                         {
                             await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me Chatting You used the command with the wrong syntax. Correct syntax: !nekorgb on/off/toggle <device> optional:<rgb colour like 250,59,177>");
                         }
-                        catch {
+                        catch
+                        {
                             throw;
                         }
                     }
@@ -446,7 +409,7 @@ namespace NekoChattingBot
                 }
                 catch (Exception e)
                 {
-                    await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me Chatting L + Ratio + Rip Bozo + {e} {e.Message}");
+                    await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me Chatting L + Ratio + Rip Bozo + {e.Message}");
                 }
             };
             await Task.Delay(-1);
