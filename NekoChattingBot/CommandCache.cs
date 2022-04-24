@@ -29,7 +29,7 @@ namespace NekoChattingBot
                             .Where(t => t.IsClass && t.Namespace == "NekoChattingBot.Commands")
                             .ToList();
 
-            Regex reflectionOnlyClasses = new Regex(@"<\w+>(\w+)?");
+            Regex reflectionOnlyClasses = new Regex(@"<(\w+)?>(\w+)?");
 
             foreach (var _command in commands)
             {
