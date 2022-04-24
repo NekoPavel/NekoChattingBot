@@ -118,7 +118,7 @@ namespace NekoChattingBot
                     }
 
                     dynamic commandInstance = commandCache.GetCommandInstance(command);
-                    commandInstance.Execute(twitchBot, String.Join(" ", msgArguments.Skip(1).ToArray()));
+                    commandInstance.Execute(twitchBot, twitchChatMessage, String.Join(" ", msgArguments.Skip(1).ToArray()));
 
                     return;
 
