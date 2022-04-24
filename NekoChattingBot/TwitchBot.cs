@@ -99,7 +99,7 @@ namespace NekoChattingBot
                 //Respond with PONG :tmi.twitch.tv
                 if (line.StartsWith("PING"))
                 {
-                    Console.WriteLine($"PING {split[1]}");
+                    //Console.WriteLine($"PING {split[1]}");
                     await streamWriter.WriteLineAsync($"PONG {split[1]}");
                 }
                 //else if (line.Contains("Chatting"))
