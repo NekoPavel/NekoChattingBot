@@ -7,7 +7,11 @@
 
   <ItemGroup>
     <PackageReference Include="AsyncAwaitBestPractices" Version="6.0.4" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.OwinSelfHost" Version="5.2.8" />
+    <PackageReference Include="Microsoft.AspNet.WebHooks.Custom" Version="1.2.2" />
+    <PackageReference Include="Microsoft.AspNet.WebHooks.Receivers.Custom" Version="1.2.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Owin" Version="1.0.0" />
   </ItemGroup>
 
 </Project>

@@ -10,6 +10,8 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Globalization;
+using NekoChattingBot.Webhook;
+using Microsoft.Owin.Hosting;
 
 namespace NekoChattingBot
 {
@@ -17,8 +19,12 @@ namespace NekoChattingBot
     {
         static async Task Main(string[] args)
         {
+            //var bruh = new WebApiConfig();
+            //var test = new LiveWebHookHandler();
+            //test.Receiver;
+            string shocker = "";
             DateTime lastSeen = DateTime.MinValue;
-            string mods = "ThatOneGuyWhoSpamsPogpega, aeonim, andros18, bennyoberwinch, bigtimemassivecash, binfy, bluecrystal004, boxbox, chase55t, chrchie, cloud9, deadrote, derpyfoxplayz, digitalhypno, dios_dong, doremy, elcheer, eleeement_, emanfman, enyoti, fossabot, happystick, honmi, intlcoco, itswinter, jamiethebull, joiechii, kaoran, kerneon, ksn24, l3lackshark, littleendu, luckfire, mikuia, mrchompysaur, mrdutchboi, mrnolife_, nightbot, olibomby, oralekin, piscator_, rainbowmeeps, ryotou, shigetora, shugi, slpchatbot, soarnathan, soran2202, streamelements, stunterletsplay, thepoon, theramu, therealzachtv, toekneered, toybickler, tru3o_o, tuonto, warpworldbot, wholewheatpete, yazzehh, ypaperr, zarrah, zonelouise, nekopavel";
+            string mods = "ThatOneGuyWhoSpamsPogpega, aeonim, andros18, bennyoberwinch, bigtimemassivecash, binfy, bluecrystal004, boxbox, chase55t, chrchie, cloud9, deadrote, derpyfoxplayz, digitalhypno, dios_dong, doremy, elcheer, eleeement_, emanfman, enyobot, enyoti, filipus098, fossabot, happystick, honmi, intlcoco, itswinter, jame0443, jamiethebull, joiechii, kaoran, kerneon, kroytz, ksn24, l3lackshark, littleendu, luckfire, mikuia, mrchompysaur, mrdutchboi, mrnolife_, nightbot, olibomby, oralekin, piscator_, rainbowmeeps, ryotou, shigetora, shugi, slpchatbot, soarnathan, soran2202, streamelements, stunterletsplay, thepoon, theramu, therealzachtv, toekneered, toybickler, tru3o_o, tuonto, warpworldbot, wholewheatpete, yazzehh, ypaperr, zarrah, zonelouise nekopavel";
             string password = Environment.GetEnvironmentVariable("TWITCH_OAUTH", EnvironmentVariableTarget.User);
             string botUsername = "NekoChattingBot";
 
@@ -27,6 +33,7 @@ namespace NekoChattingBot
             //We could .SafeFireAndForget() these two calls if we want to
             await twitchBot.JoinChannel("btmc");
             await twitchBot.JoinChannel("nekopavel");
+            await twitchBot.JoinChannel("schip3s");
             await twitchBot.JoinChannel("nekochattingbot");
             //await twitchBot.JoinChannel("emanfman");
             await twitchBot.JoinChannel("thatoneguywhospamspogpega");
@@ -42,10 +49,10 @@ namespace NekoChattingBot
                         await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me @{twitchChatMessage.Sender} Stare GunL you didn't write \"Pogpega\" in your message, @mods ban him.");
                     }
                     Console.WriteLine($"{twitchChatMessage.Sender} said '{twitchChatMessage.Message}'");
-                    if (twitchChatMessage.Sender == "streamelements" && twitchChatMessage.Message.Contains("Use code \"BTMC\" for a 30% discount on your order at https://gfuel.ly/2ZplQ3B OkayChamp"))
-                    {
+                    if (twitchChatMessage.Sender == "streamelements" && twitchChatMessage.Message.Contains("Use code \"BTMC\" for a 10% discount on your order at https://gfuel.ly/2ZplQ3B OkayChamp"))
                         await twitchBot.SendMessage(twitchChatMessage.Channel, "/me gachiHYPER 👆 Use code \"Soque Macaque\" !!!");
-                    }
+                    else if (twitchChatMessage.Message.Contains("!nekoskin"))
+                        await twitchBot.SendMessage(twitchChatMessage.Channel, $"@{twitchChatMessage.Sender} https://thighs.moe/wJelFWPijn40");
                     else if (twitchChatMessage.Message.Contains("!bored")) await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me HACKERMANS @{twitchChatMessage.Sender} create a chatbot.");
                     #region disabled
                     //else if (twitchChatMessage.Message.Contains("!red"))
@@ -89,6 +96,14 @@ namespace NekoChattingBot
                             }
                         }
                     }
+                    else if (twitchChatMessage.Message.Contains("frick", StringComparison.OrdinalIgnoreCase) && twitchChatMessage.Message.Contains("nekochattingbot", StringComparison.OrdinalIgnoreCase))
+                        await twitchBot.SendMessage(twitchChatMessage.Channel, $"@{twitchChatMessage.Sender} FRICK");
+                    else if (twitchChatMessage.Message.Contains(">shock", StringComparison.OrdinalIgnoreCase))
+                        shocker = twitchChatMessage.Sender;
+                    else if (twitchChatMessage.Message.Contains("asmonLong2", StringComparison.OrdinalIgnoreCase))
+                        await twitchBot.SendMessage(twitchChatMessage.Channel, $"Chatting");
+                    else if (twitchChatMessage.Message.Contains("Pogpega ⚡ pepeMeltdown ⚡", StringComparison.OrdinalIgnoreCase) && twitchChatMessage.Sender.Equals("ThatOneBotWhoSpamsPogpega", StringComparison.OrdinalIgnoreCase))
+                        await twitchBot.SendMessage(twitchChatMessage.Channel, $"reeferSad Stop bot abuse! @{shocker} PogO");
                     else if (twitchChatMessage.Message.Contains("!rice"))
                     {
                         using (var webClient = new System.Net.WebClient())
@@ -154,6 +169,18 @@ namespace NekoChattingBot
                                                 break;
                                             case "AutoKeepWarm":
                                                 await twitchBot.SendMessage(twitchChatMessage.Channel, $"The rice is done, it has been kept warm for {minutes} minutes now.");
+                                                break;
+                                            case "PreCook":
+                                                string timeOutput = "";
+                                                TimeSpan startIn = TimeSpan.FromMinutes(double.Parse(minutes));
+                                                //$"modCheck He seems to be in chat. (Last chatted {lastSeenAgo.TotalMinutes} minutes ago)"
+                                                if (startIn.Hours > 0)
+                                                    timeOutput = $"({startIn.Hours} hour(s), {startIn.Minutes} minute(s) and {startIn.Seconds} second(s))";
+                                                else if (startIn.Minutes > 0)
+                                                    timeOutput = $"({startIn.Minutes} minute(s) and {startIn.Seconds} second(s))";
+                                                else if (startIn.Seconds > 0)
+                                                    timeOutput = $"({startIn.Seconds} second(s))";
+                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Rice cooker is scheduled to start cooking rice in a while (timer function brokey).");
                                                 break;
                                             default:
                                                 await twitchBot.SendMessage(twitchChatMessage.Channel, $"Unknown state: {state}");
@@ -355,16 +382,25 @@ namespace NekoChattingBot
                         {
                             await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me Chatting You used the command with the wrong syntax. Correct syntax: !nekorgb on/off/toggle <device> optional:<rgb colour like 250,59,177>");
                         }
-                        catch {
+                        catch
+                        {
                             throw;
                         }
                     }
+                    //else if (twitchChatMessage.Message.StartsWith("!cbot"))
+                    //{
+                    //    await twitchBot.SendMessage(twitchChatMessage.Channel,twitchChatMessage.Message.Replace('!','>'));
+                    //}
+                    //else if (twitchChatMessage.Message.Contains("this command requires you to be following the Pogpega MaN", StringComparison.OrdinalIgnoreCase) && twitchChatMessage.Sender.Equals("ThatOneBotWhoSpamsPogpega", StringComparison.OrdinalIgnoreCase))
+                    //{
+                    //    await twitchBot.SendMessage(twitchChatMessage.Channel,$"peepoGiggles use !cbot instead");
+                    //}
                     else if (twitchChatMessage.Message.Contains("!math 9+10") || twitchChatMessage.Message.Contains("!math 10+9"))
                         await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me Chatting @{twitchChatMessage.Sender} 21");
                     else if (twitchChatMessage.Message.Contains("!math 77+33") || twitchChatMessage.Message.Contains("!math 33+77"))
                         await twitchBot.SendMessage(twitchChatMessage.Channel, $"/me Chatting @{twitchChatMessage.Sender} 100");
                     else if (twitchChatMessage.Message.Contains("Boolin") && twitchChatMessage.Message.Contains("?") && twitchChatMessage.Sender.Equals("mrdutchboi", StringComparison.OrdinalIgnoreCase))
-                        await twitchBot.SendMessage(twitchChatMessage.Channel, $"Zxjq we boolin Boolin");
+                        await twitchBot.SendMessage(twitchChatMessage.Channel, "Yeah we boolin Boolin");
                     else if (twitchChatMessage.Message.Contains("!isedlive"))
                     {
                         using (var webClient = new System.Net.WebClient())

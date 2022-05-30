@@ -21,6 +21,8 @@ namespace NekoChattingBot
         private StreamWriter streamWriter;
         private TaskCompletionSource<int> connected = new TaskCompletionSource<int>();
 
+        private bool isBtmcLive;
+
         public event TwitchChatEventHandler OnMessage = delegate { };
         public delegate void TwitchChatEventHandler(object sender, TwitchChatMessage e);
 
@@ -37,9 +39,12 @@ namespace NekoChattingBot
             this.password = password;
         }
 
+        private string lastmessage = ""; //󠀀
+
         public async Task SendMessage(string channel, string message)
         {
-            if (channel.Equals("btmc") && message!= "SEEYOUNEXTTIME")
+            
+            if (channel.Equals("btmc") && (message!= "SEEYOUNEXTTIME" || message!=("Yeah we boolin Boolin")))
             {
                 //http://192.168.1.202:8123/api/states/sensor.btmc
                 using (var webClient = new System.Net.WebClient())
@@ -49,14 +54,17 @@ namespace NekoChattingBot
                     // Now parse with JSON.Net
                     dynamic btmcLive = JObject.Parse(json);
                     string liveState = btmcLive.state;
-                    if (liveState.Equals("true", StringComparison.OrdinalIgnoreCase))
+                    if (liveState.Equals("true", StringComparison.OrdinalIgnoreCase) && !isBtmcLive)
                     {
                         channel = "nekochattingbot";
                     }
                 }
             }
+            if (message == lastmessage)
+                message += " 󠀀";
             await connected.Task;
             await streamWriter.WriteLineAsync($"PRIVMSG #{channel} :{message}");
+            lastmessage = message;
         }
 
         public async Task JoinChannel(string channel)
