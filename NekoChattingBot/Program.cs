@@ -102,6 +102,8 @@ namespace NekoChattingBot
                         shocker = twitchChatMessage.Sender;
                     else if (twitchChatMessage.Message.Contains("asmonLong2", StringComparison.OrdinalIgnoreCase))
                         await twitchBot.SendMessage(twitchChatMessage.Channel, $"Chatting");
+                    else if (twitchChatMessage.Message.Contains("btmc1 btmc2", StringComparison.OrdinalIgnoreCase))
+                        await twitchBot.SendMessage(twitchChatMessage.Channel, $"Chatting");
                     else if (twitchChatMessage.Message.Contains("Pogpega ⚡ pepeMeltdown ⚡", StringComparison.OrdinalIgnoreCase) && twitchChatMessage.Sender.Equals("ThatOneBotWhoSpamsPogpega", StringComparison.OrdinalIgnoreCase))
                         await twitchBot.SendMessage(twitchChatMessage.Channel, $"reeferSad Stop bot abuse! @{shocker} PogO");
                     else if (twitchChatMessage.Message.Contains("!rice"))
