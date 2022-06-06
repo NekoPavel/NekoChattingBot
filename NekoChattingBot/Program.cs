@@ -132,7 +132,7 @@ namespace NekoChattingBot
                                 json = webClient.DownloadString("http://192.168.1.202:8123/api/states/sensor.xiaomi_miio_cooker_remaining");
                                 dynamic riceCookerRemaining = JObject.Parse(json);
 
-                                string minutes = riceCookerRemaining.state;
+                                string minutes = int.Parse(riceCookerRemaining.state) > 1 ? $"{riceCookerRemaining.state} minutes" : "1 minute";
 
                                 json = webClient.DownloadString("http://192.168.1.202:8123/api/states/sensor.xiaomi_miio_cooker_duration");
                                 dynamic riceCookerDuration = JObject.Parse(json);
@@ -164,26 +164,27 @@ namespace NekoChattingBot
                                         switch (state)
                                         {
                                             case "Running":
-                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Rice is cooking, {minutes} minutes remaining until it is done. Current temperature: {temperature}°C Current stage is: {stage}, {stageDescription}.");
+                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Rice is cooking, {minutes} remaining until it is done. Current temperature: {temperature}°C Current stage is: {stage}, {stageDescription}.");
                                                 break;
                                             case "Waiting":
                                                 await twitchBot.SendMessage(twitchChatMessage.Channel, "Ricecooker is idle.");
                                                 break;
                                             case "AutoKeepWarm":
-                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"The rice is done, it has been kept warm for {minutes} minutes now.");
+                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"The rice is done, it has been kept warm for {minutes} minute(s) now.");
                                                 break;
-                                            case "PreCook":
-                                                string timeOutput = "";
-                                                TimeSpan startIn = TimeSpan.FromMinutes(double.Parse(minutes));
-                                                //$"modCheck He seems to be in chat. (Last chatted {lastSeenAgo.TotalMinutes} minutes ago)"
-                                                if (startIn.Hours > 0)
-                                                    timeOutput = $"({startIn.Hours} hour(s), {startIn.Minutes} minute(s) and {startIn.Seconds} second(s))";
-                                                else if (startIn.Minutes > 0)
-                                                    timeOutput = $"({startIn.Minutes} minute(s) and {startIn.Seconds} second(s))";
-                                                else if (startIn.Seconds > 0)
-                                                    timeOutput = $"({startIn.Seconds} second(s))";
-                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Rice cooker is scheduled to start cooking rice in a while (timer function brokey).");
-                                                break;
+                                            //broken code
+                                            //case "PreCook":
+                                            //    string timeOutput = "";
+                                            //    TimeSpan startIn = TimeSpan.FromMinutes(double.Parse(minutes));
+                                            //    //$"modCheck He seems to be in chat. (Last chatted {lastSeenAgo.TotalMinutes} minutes ago)"
+                                            //    if (startIn.Hours > 0)
+                                            //        timeOutput = $"({startIn.Hours} hour(s), {startIn.Minutes} minute(s) and {startIn.Seconds} second(s))";
+                                            //    else if (startIn.Minutes > 0)
+                                            //        timeOutput = $"({startIn.Minutes} minute(s) and {startIn.Seconds} second(s))";
+                                            //    else if (startIn.Seconds > 0)
+                                            //        timeOutput = $"({startIn.Seconds} second(s))";
+                                            //    await twitchBot.SendMessage(twitchChatMessage.Channel, $"Rice cooker is scheduled to start cooking rice in a while (timer function brokey).");
+                                            //    break;
                                             default:
                                                 await twitchBot.SendMessage(twitchChatMessage.Channel, $"Unknown state: {state}");
                                                 break;
@@ -193,7 +194,7 @@ namespace NekoChattingBot
                                         switch (state)
                                         {
                                             case "Running":
-                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Rice is being reheated, it has been kept warm for {minutes} minutes now. Current temperature is {temperature}°C");
+                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Rice is being reheated, it has been kept warm for {minutes} now. Current temperature is {temperature}°C");
                                                 break;
                                             default:
                                                 await twitchBot.SendMessage(twitchChatMessage.Channel, $"Unknown state: {state}");
@@ -204,10 +205,10 @@ namespace NekoChattingBot
                                         switch (state)
                                         {
                                             case "Running":
-                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Making rice congee (rice cum), {minutes} minutes remaining until it is done. Current stage is: {stage}, {stageDescription}.");
+                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Making rice congee (rice cum), {minutes} remaining until it is done. Current stage is: {stage}, {stageDescription}.");
                                                 break;
                                             case "AutoKeepWarm":
-                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"The rice congee is done (rice cum), it has been kept warm for {minutes} minutes now.");
+                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"The rice congee is done (rice cum), it has been kept warm for {minutes} now.");
                                                 break;
                                             default:
                                                 await twitchBot.SendMessage(twitchChatMessage.Channel, $"Unknown state: {state}");
@@ -218,7 +219,7 @@ namespace NekoChattingBot
                                         switch (state)
                                         {
                                             case "Running":
-                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Rice is being reheated, it will be done in {minutes} minutes. Current temperature is {temperature}°C. Current stage is: {stage}, {stageDescription}.");
+                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Rice is being reheated, it will be done in {minutes}. Current temperature is {temperature}°C. Current stage is: {stage}, {stageDescription}.");
                                                 break;
                                             default:
                                                 await twitchBot.SendMessage(twitchChatMessage.Channel, $"Unknown state: {state}");
@@ -229,7 +230,7 @@ namespace NekoChattingBot
                                         switch (state)
                                         {
                                             case "Running":
-                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Making tasty rice, it will be done in {minutes} minutes. Current temperature is {temperature}°C. Current stage is: {stage}, {stageDescription}.");
+                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"Making tasty rice, it will be done in {minutes}. Current temperature is {temperature}°C. Current stage is: {stage}, {stageDescription}.");
                                                 break;
                                             case "PreCook":
                                                 string timeOutput = "";
@@ -244,7 +245,7 @@ namespace NekoChattingBot
                                                 await twitchBot.SendMessage(twitchChatMessage.Channel, $"Rice cooker is scheduled to start cooking tasty rice in {timeOutput}.");
                                                 break;
                                             case "AutoKeepWarm":
-                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"The tasty rice is done, it has been kept warm for {minutes} minutes now.");
+                                                await twitchBot.SendMessage(twitchChatMessage.Channel, $"The tasty rice is done, it has been kept warm for {minutes} now.");
                                                 break;
                                             default:
                                                 await twitchBot.SendMessage(twitchChatMessage.Channel, $"Unknown state: {state}");
@@ -269,11 +270,11 @@ namespace NekoChattingBot
 
                                 string timeOutput = "";
                                 if (timeDiff.Days > 0)
-                                    timeOutput = timeDiff.Days.ToString() + " days, " + timeDiff.Hours.ToString() + " hours and " + timeDiff.Minutes.ToString() + " minutes";
+                                    timeOutput = timeDiff.Days.ToString() + " day" + ((timeDiff.Days > 1) ? "s" : "") + ", " + timeDiff.Hours.ToString() + " hour" + ((timeDiff.Hours > 1) ? "s" : "") + " and " + timeDiff.Minutes.ToString() + " minute" + ((timeDiff.Minutes > 1) ? "s" : "");
                                 else if (timeDiff.Hours > 0)
-                                    timeOutput = timeDiff.Hours.ToString() + " hours and " + timeDiff.Minutes.ToString() + " minutes";
+                                    timeOutput = timeDiff.Hours.ToString() + " hour" + ((timeDiff.Hours > 1) ? "s" : "") + " and " + timeDiff.Minutes.ToString() + " minute" + ((timeDiff.Minutes > 1) ? "s" : "");
                                 else if (timeDiff.Minutes > 0)
-                                    timeOutput = timeDiff.Minutes.ToString() + " minutes";
+                                    timeOutput = timeDiff.Minutes.ToString() + " minute" + ((timeDiff.Minutes > 1) ? "s" : "");
 
                                 await twitchBot.SendMessage(twitchChatMessage.Channel, $"The rice cooker is off. It was last on {timeOutput} ago");
                             }
