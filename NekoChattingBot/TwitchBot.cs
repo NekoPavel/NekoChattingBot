@@ -54,7 +54,7 @@ namespace NekoChattingBot
                     // Now parse with JSON.Net
                     dynamic btmcLive = JObject.Parse(json);
                     string liveState = btmcLive.state;
-                    if (liveState.Equals("true", StringComparison.OrdinalIgnoreCase) && !isBtmcLive)
+                    if (!liveState.Equals("false", StringComparison.OrdinalIgnoreCase) && !isBtmcLive)
                     {
                         channel = "nekochattingbot";
                     }
