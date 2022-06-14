@@ -12,6 +12,8 @@ using System.Text.Json.Serialization;
 using System.Globalization;
 using NekoChattingBot.Webhook;
 using Microsoft.Owin.Hosting;
+using System.Web.Http;
+using Owin;
 
 namespace NekoChattingBot
 {
@@ -19,10 +21,26 @@ namespace NekoChattingBot
     {
         static async Task Main(string[] args)
         {
+            //var port = 8123;
+            //var url = $"http://localhost:{port}";
+            //var config = new HttpConfiguration();
+            //config.Routes.MapHttpRoute(
+            //    name: "DefaultApi",
+            //    routeTemplate: "api/{controller}/{id}",
+            //    defaults: new { id = RouteParameter.Optional }
+            //);
+            //using (WebApp.Start(url, app =>
+            //{
+            //    app.UseWebApi(config);
+            //})) {
+            //    Console.WriteLine($"Webhook server is running at {url}");
+            //    await Task.Delay(-1);
+            //}
             //var bruh = new WebApiConfig();
             //var test = new LiveWebHookHandler();
             //test.Receiver;
             string shocker = "";
+            DateTime streamtime = DateTime.ParseExact("2727-01-01 19:00:00", "yyyy-MM-dd HH:mm:ss", CultureInfo.CurrentCulture);
             DateTime lastSeen = DateTime.MinValue;
             string mods = "ThatOneGuyWhoSpamsPogpega, aeonim, andros18, bennyoberwinch, bigtimemassivecash, binfy, bluecrystal004, boxbox, chase55t, chrchie, cloud9, deadrote, derpyfoxplayz, digitalhypno, dios_dong, doremy, elcheer, eleeement_, emanfman, enyobot, enyoti, filipus098, fossabot, happystick, honmi, intlcoco, itswinter, jame0443, jamiethebull, joiechii, kaoran, kerneon, kroytz, ksn24, l3lackshark, littleendu, luckfire, mikuia, mrchompysaur, mrdutchboi, mrnolife_, nightbot, olibomby, oralekin, piscator_, rainbowmeeps, ryotou, shigetora, shugi, slpchatbot, soarnathan, soran2202, streamelements, stunterletsplay, thepoon, theramu, therealzachtv, toekneered, toybickler, tru3o_o, tuonto, warpworldbot, wholewheatpete, yazzehh, ypaperr, zarrah, zonelouise nekopavel";
             string password = Environment.GetEnvironmentVariable("TWITCH_OAUTH", EnvironmentVariableTarget.User);
@@ -100,10 +118,32 @@ namespace NekoChattingBot
                         await twitchBot.SendMessage(twitchChatMessage.Channel, $"@{twitchChatMessage.Sender} FRICK");
                     else if (twitchChatMessage.Message.Contains(">shock", StringComparison.OrdinalIgnoreCase))
                         shocker = twitchChatMessage.Sender;
+                    else if (twitchChatMessage.Message.Contains("!streamin", StringComparison.OrdinalIgnoreCase))
+                    {
+                        TimeSpan untilStream = TimeSpan.Parse(streamtime.ToLongTimeString()) - TimeSpan.Parse(DateTime.Now.ToLongTimeString());
+                        string timeString = "";
+                        if (untilStream.Hours != 0)
+                        {
+                            timeString += untilStream.Hours + " hour" + ((untilStream.Hours > 1) ? "s" : "");
+                        }
+                        if (untilStream.Minutes != 0)
+                        {
+                            timeString += (timeString.Length > 0 ? " and " : "") + untilStream.Minutes + " minute" + ((untilStream.Minutes > 1) ? "s" : "");
+                        }
+                        if (untilStream.Seconds != 0)
+                        {
+                            timeString += (timeString.Length > 0 ? " and " : "") + untilStream.Seconds + " second" + ((untilStream.Seconds > 1) ? "s" : "");
+                        }
+                        await twitchBot.SendMessage(twitchChatMessage.Channel, $"Assuming that Ed goes live on time, stream will begin in {timeString}. @{twitchChatMessage.Sender}");
+                    }
                     else if (twitchChatMessage.Message.Contains("asmonLong2", StringComparison.OrdinalIgnoreCase))
                         await twitchBot.SendMessage(twitchChatMessage.Channel, $"Chatting");
                     else if (twitchChatMessage.Message.Contains("btmc1 btmc2", StringComparison.OrdinalIgnoreCase))
                         await twitchBot.SendMessage(twitchChatMessage.Channel, $"Chatting");
+                    else if (twitchChatMessage.Message.Contains("Chatting this is a copypasta.", StringComparison.OrdinalIgnoreCase))
+                        await twitchBot.SendMessage(twitchChatMessage.Channel, $"Chatting this is a copypasta.");
+                    else if (twitchChatMessage.Message.Contains("!cum", StringComparison.OrdinalIgnoreCase))
+                        await twitchBot.SendMessage(twitchChatMessage.Channel, $"https://streamable.com/hb0dps @{twitchChatMessage.Sender}");
                     else if (twitchChatMessage.Message.Contains("Pogpega ⚡ pepeMeltdown ⚡", StringComparison.OrdinalIgnoreCase) && twitchChatMessage.Sender.Equals("ThatOneBotWhoSpamsPogpega", StringComparison.OrdinalIgnoreCase))
                         await twitchBot.SendMessage(twitchChatMessage.Channel, $"reeferSad Stop bot abuse! @{shocker} PogO");
                     else if (twitchChatMessage.Message.Contains("!rice"))

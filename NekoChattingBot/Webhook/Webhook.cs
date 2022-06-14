@@ -1,24 +1,20 @@
 ﻿using Microsoft.AspNet.WebHooks;
 using Owin;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
 
 namespace NekoChattingBot.Webhook
 {
+    
     public class WebApiConfig
     {
-        // This code configures Web API. The Startup class is specified as a type
-        // parameter in the WebApp.Start method.
-        public void Configuration(IAppBuilder appBuilder)
+        public static void Register(HttpConfiguration config)
         {
-            // Configure Web API for self-host. 
-            HttpConfiguration config = new HttpConfiguration();
-
-            // Set the assembly resolver so that WebHooks receiver controller is loaded.
-            WebHookAssemblyResolver assemblyResolver = new WebHookAssemblyResolver();
-            config.Services.Replace(typeof(IAssembliesResolver), assemblyResolver);
+            // Web API configuration and services
+            config.Services.Replace(typeof(IAssembliesResolver), new CustomAssembliesResolver());
 
             // Web API routes
             config.MapHttpAttributeRoutes();
@@ -28,33 +24,17 @@ namespace NekoChattingBot.Webhook
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
-
-            appBuilder.UseWebApi(config);
-
-            // Initialize Custom WebHook receiver
-            config.InitializeReceiveCustomWebHooks();
         }
     }
-    public class LiveWebHookHandler : WebHookHandler
+
+    public class CustomAssembliesResolver : DefaultAssembliesResolver
     {
-        public LiveWebHookHandler()
+        public override ICollection<Assembly> GetAssemblies()
         {
-            this.Receiver = CustomWebHookReceiver.ReceiverName;
-        }
-
-        public override Task ExecuteAsync(string generator, WebHookHandlerContext context)
-        {
-            // Get data from WebHook
-            CustomNotifications data = context.GetDataOrDefault<CustomNotifications>();
-
-            // Get data from each notification in this WebHook
-            foreach (IDictionary<string, object> notification in data.Notifications)
+            return new List<Assembly>(base.GetAssemblies())
             {
-                // Process data
-                System.Console.WriteLine(notification);
-            }
-
-            return Task.FromResult(true);
+                typeof(WebHookHandler).Assembly
+            };
         }
     }
 }

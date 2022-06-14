@@ -23,6 +23,7 @@ namespace NekoChattingBot
 
         private bool isBtmcLive;
 
+
         public event TwitchChatEventHandler OnMessage = delegate { };
         public delegate void TwitchChatEventHandler(object sender, TwitchChatMessage e);
 
